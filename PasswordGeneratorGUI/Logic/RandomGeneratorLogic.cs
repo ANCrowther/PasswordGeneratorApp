@@ -8,16 +8,23 @@ public static class RandomGeneratorLogic {
     private static List<char> specialChars = new();
 
     public static void SetRequirements() {
-        if (model.MaximumLength <= model.MinimumLength) {
-            model.MaximumLength = model.MinimumLength + 1;
+        if (model.MinimumLength == 0) {
+            model.MinimumLength = 1;
+        }
+        if (model.MaximumLength < model.MinimumLength) {
+            model.MaximumLength = model.MinimumLength;
+        }
+        if (model.MinimumLength <= model.MinimumLowerCase) {
+            model.MinimumLowerCase = model.MinimumLength - 1;
+        }
+        if (model.MinimumLength <= model.MinimumUpperCase) {
+            model.MinimumUpperCase = model.MinimumLength - 1;
         }
         if (model.MinimumLength <= model.MinimumSpecialCharacters) {
             model.MinimumSpecialCharacters = model.MinimumLength - 1;
-            model.MinimumSpecialCharacters = (model.MinimumSpecialCharacters <= 0) ? 0 : model.MinimumSpecialCharacters;
         }
         if (model.MinimumLength <= model.MinimumNumbers) {
             model.MinimumNumbers = model.MinimumLength - 1;
-            model.MinimumNumbers = (model.MinimumNumberCount <= 0) ? 0 : model.MinimumNumbers;
         }
         while ((model.MinimumNumbers + model.MinimumSpecialCharacters) >= model.MinimumLength) {
             model.MinimumNumbers = (model.MinimumNumbers <= 0) ? 0 : model.MinimumNumbers - 1;
@@ -37,9 +44,7 @@ public static class RandomGeneratorLogic {
 
     private static void GetSpecialCharacters() {
         specialChars.Clear();
-        model.AllowedSpecialCharacters = model.AllowedSpecialCharacters.Replace(" ", "");
-        char[] delimiterChars = { ',', ';' };
-        string[] chars = model.AllowedSpecialCharacters.Split(delimiterChars);
+        string[] chars = model.AllowedSpecialCharacters.Split(" ");
         foreach (string s in chars) {
             specialChars.Add(s[0]);
         }
@@ -69,7 +74,9 @@ public static class RandomGeneratorLogic {
         do {
             model.Password = "";
             model.SpecialCharacterCount = 0;
-            model.MinimumNumberCount = 0;
+            model.NumberCount = 0;
+            model.UpperCaseCount = 0;
+            model.LowerCaseCount = 0;
             for (int i = 0; i < passwordLength; i++) {
                 string temp = characters[_random.Next(0, listCount)].ToString();
                 model.Password += temp;
@@ -77,14 +84,20 @@ public static class RandomGeneratorLogic {
                     model.SpecialCharacterCount++;
                 }
                 if (IsNumber(temp)) {
-                    model.MinimumNumberCount++;
+                    model.NumberCount++;
+                }
+                if (IsLowerCaseLetter(temp)) {
+                    model.LowerCaseCount++;
+                }
+                if (IsUpperCaseLetter(temp)) {
+                    model.UpperCaseCount++;
                 }
             }
         } while (NotMeetingRequirements());
     }
 
     private static bool NotMeetingRequirements() {
-        return (!((model.SpecialCharacterCount >= model.MinimumSpecialCharacters) && (model.MinimumNumberCount >= model.MinimumNumbers)));
+        return !model.MeetsRequirements;
     }
 
     private static bool IsSpecialCharacter(string input) {
@@ -100,5 +113,13 @@ public static class RandomGeneratorLogic {
 
     private static bool IsNumber(string input) {
         return ((int)input[0] > 47 && (int)input[0] < 58);
+    }
+
+    private static bool IsLowerCaseLetter(string input) {
+        return ((int)input[0] > 96 && (int)input[0] < 123);
+    }
+
+    private static bool IsUpperCaseLetter(string input) {
+        return ((int)input[0] > 64 && (int)input[0] < 91);
     }
 }
