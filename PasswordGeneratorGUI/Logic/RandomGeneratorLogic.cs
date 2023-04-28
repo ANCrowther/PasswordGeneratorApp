@@ -8,9 +8,6 @@ public static class RandomGeneratorLogic {
     private static List<char> specialChars = new();
 
     public static void SetRequirements() {
-        if (model.MinimumLength == 0) {
-            model.MinimumLength = 1;
-        }
         if (model.MaximumLength < model.MinimumLength) {
             model.MaximumLength = model.MinimumLength;
         }
@@ -26,9 +23,11 @@ public static class RandomGeneratorLogic {
         if (model.MinimumLength <= model.MinimumNumbers) {
             model.MinimumNumbers = model.MinimumLength - 1;
         }
-        while ((model.MinimumNumbers + model.MinimumSpecialCharacters) >= model.MinimumLength) {
+        while ((model.MinimumNumbers + model.MinimumSpecialCharacters + model.MinimumLowerCase + model.MinimumUpperCase) >= model.MinimumLength) {
             model.MinimumNumbers = (model.MinimumNumbers <= 0) ? 0 : model.MinimumNumbers - 1;
             model.MinimumSpecialCharacters = (model.MinimumSpecialCharacters <= 0) ? 0 : model.MinimumSpecialCharacters - 1;
+            model.MinimumLowerCase = (model.MinimumLowerCase <= 0) ? 0 : model.MinimumLowerCase - 1;
+            model.MinimumUpperCase = (model.MinimumUpperCase <= 0) ? 0 : model.MinimumUpperCase - 1;
         }
 
         characters.Clear();
